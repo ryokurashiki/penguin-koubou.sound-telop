@@ -26,6 +26,7 @@ export default function DashboardLayout({
   const [showHelp, setShowHelp] = useState(false);
   const [isDark, setIsDark] = useState(true);
   const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);
+  const [globalMaintenanceMode, setGlobalMaintenanceMode] = useState(false);
 
   const fetchProfile = async () => {
     try {
@@ -52,7 +53,11 @@ export default function DashboardLayout({
         .select("value")
         .eq("key", "maintenance_mode")
         .single();
-      if (settingData?.value === "true" && data?.role !== "admin") {
+      
+      const isMaintenanceOn = settingData?.value === "true";
+      setGlobalMaintenanceMode(isMaintenanceOn);
+
+      if (isMaintenanceOn && data?.role !== "admin") {
         setIsMaintenanceMode(true);
       } else {
         setIsMaintenanceMode(false);
@@ -223,6 +228,15 @@ export default function DashboardLayout({
           </div>
         </div>
       </header>
+
+      {/* 管理者向け：メンテナンス中バナー */}
+      {globalMaintenanceMode && !isMaintenanceMode && (
+        <div className="bg-amber-500/10 border-b border-amber-500/20 py-2 px-4 flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400 text-sm font-bold shadow-inner">
+          <Construction className="w-4 h-4 animate-pulse" />
+          <span>現在、一般ユーザー向けのアクセスを遮断し、メンテナンスモードで稼働中です</span>
+        </div>
+      )}
+
       <main className="max-w-7xl mx-auto px-4 py-8">
         {isMaintenanceMode ? (
           <div className="flex flex-col items-center justify-center py-32 text-center">
