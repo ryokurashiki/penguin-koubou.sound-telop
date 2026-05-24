@@ -238,7 +238,12 @@ export default function DashboardLayout({
       )}
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        {isMaintenanceMode ? (
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-32 text-neutral-500">
+            <Loader2 className="w-8 h-8 animate-spin text-indigo-500 mb-4" />
+            <p className="text-sm font-medium">状態を確認中...</p>
+          </div>
+        ) : isMaintenanceMode ? (
           <div className="flex flex-col items-center justify-center py-32 text-center">
             <div className="p-6 bg-amber-500/10 text-amber-400 rounded-full border border-amber-500/20 mb-6">
               <Construction className="w-12 h-12" />

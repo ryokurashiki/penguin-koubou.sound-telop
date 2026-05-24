@@ -10,6 +10,9 @@ CREATE TABLE IF NOT EXISTS public.app_settings (
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- すでにテーブルが存在していた場合のためにカラムを追加（エラー回避）
+ALTER TABLE public.app_settings ADD COLUMN IF NOT EXISTS description text;
+
 -- RLS（Row Level Security）の有効化
 ALTER TABLE public.app_settings ENABLE ROW LEVEL SECURITY;
 

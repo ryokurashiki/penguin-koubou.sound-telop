@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { LogIn, UserPlus, Info } from "lucide-react";
+import { LogIn, UserPlus, Info, Construction } from "lucide-react";
 
 function LoginForm() {
   const router = useRouter();
@@ -14,6 +14,21 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+
+  useEffect(() => {
+    const checkMaintenance = async () => {
+      const { data } = await supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "maintenance_mode")
+        .single();
+      if (data?.value === "true") {
+        setMaintenanceMode(true);
+      }
+    };
+    checkMaintenance();
+  }, []);
 
   const getDummyEmail = (userId: string) => `${userId}@dummy.local`;
 
@@ -81,6 +96,13 @@ function LoginForm() {
   return (
     <div className="min-h-screen bg-white dark:bg-neutral-950 flex flex-col justify-center items-center p-4 text-neutral-800 dark:text-neutral-200 font-sans selection:bg-indigo-500/30">
       <div className="w-full max-w-md bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
+        {maintenanceMode && (
+          <div className="absolute top-0 left-0 w-full bg-amber-500 text-amber-950 text-xs font-bold py-2 text-center z-50 flex items-center justify-center gap-1.5">
+            <Construction className="w-3.5 h-3.5" />
+            現在メンテナンス中のため、一般ユーザーはログインできません
+          </div>
+        )}
+        
         {/* Decorative background glow */}
         <div className="absolute -top-32 -left-32 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
         
