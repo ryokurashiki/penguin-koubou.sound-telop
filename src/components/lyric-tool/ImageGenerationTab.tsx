@@ -19,6 +19,9 @@ export default function ImageGenerationTab({ songTitle, setSongTitle, queue, set
   const [selectedText, setSelectedText] = useState("");
   const [selectionStart, setSelectionStart] = useState(0);
 
+  // 出力リストの選択状態
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
   const [textColor, setTextColor] = useState("#ffffff");
   const [bgColor, setBgColor] = useState("#000000");
   const [bgOpacity, setBgOpacity] = useState(1.0);
@@ -742,8 +745,48 @@ export default function ImageGenerationTab({ songTitle, setSongTitle, queue, set
         {/* 出力リスト */}
         <div className="flex-1 bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden flex flex-col min-h-[200px]">
           <div className="bg-neutral-50 dark:bg-neutral-900 px-4 py-2 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between shrink-0">
-            <h3 className="text-sm font-medium text-neutral-700 dark:text-neutral-300">出力リスト（登場順ソート）</h3>
-            <span className="text-xs bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 px-2 py-1 rounded">{queue.length} 件</span>
+            <h3 className="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex items-center gap-2">
+              出力リスト
+              {selectedIds.size > 0 && (
+                <span className="text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/20">{selectedIds.size}件選択中</span>
+              )}
+            </h3>
+            <div className="flex items-center gap-2">
+              {queue.length > 0 && (
+                <>
+                  <button
+                    onClick={() => {
+                      if (selectedIds.size === queue.length) setSelectedIds(new Set());
+                      else setSelectedIds(new Set(queue.map(q => q.id)));
+                    }}
+                    className="text-xs text-neutral-500 dark:text-neutral-500 hover:text-emerald-600 dark:hover:text-emerald-400 px-2 py-1 transition-colors font-medium"
+                  >
+                    {selectedIds.size === queue.length ? "選択解除" : "すべて選択"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (selectedIds.size > 0) {
+                        setQueue(prev => prev.filter(q => !selectedIds.has(q.id)));
+                        setSelectedIds(new Set());
+                      } else {
+                        if (confirm("すべての出力リストを削除しますか？")) {
+                          setQueue([]);
+                          setSelectedIds(new Set());
+                        }
+                      }
+                    }}
+                    className={`text-xs px-2 py-1 rounded transition-colors font-medium ${
+                      selectedIds.size > 0 
+                        ? "bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 border border-red-500/20" 
+                        : "text-neutral-500 dark:text-neutral-500 hover:text-red-500"
+                    }`}
+                  >
+                    {selectedIds.size > 0 ? "選択項目を削除" : "すべて削除"}
+                  </button>
+                </>
+              )}
+              <span className="text-xs bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 px-2 py-1 rounded ml-2 font-mono">{queue.length} 件</span>
+            </div>
           </div>
           <div className="flex-1 overflow-y-auto overflow-x-auto custom-scrollbar p-3 space-y-2">
             {queue.length === 0 ? (
@@ -761,10 +804,25 @@ export default function ImageGenerationTab({ songTitle, setSongTitle, queue, set
                 const fileName = `${safeTitle}_${seqStr}_${safeText}.png`;
 
                 return (
-                  <div key={item.id} className="group flex items-center gap-3 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-2 hover:border-emerald-500/30 transition-colors">
+                  <div key={item.id} className={`group flex items-center gap-3 bg-neutral-50 dark:bg-neutral-900 border rounded-lg p-2 transition-colors ${
+                    selectedIds.has(item.id) ? "border-emerald-500 ring-1 ring-emerald-500/50 bg-emerald-500/5" : "border-neutral-200 dark:border-neutral-800 hover:border-emerald-500/30"
+                  }`}>
+                    <label className="flex items-center justify-center p-1 cursor-pointer shrink-0">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(item.id)}
+                        onChange={(e) => {
+                          const newSet = new Set(selectedIds);
+                          if (e.target.checked) newSet.add(item.id);
+                          else newSet.delete(item.id);
+                          setSelectedIds(newSet);
+                        }}
+                        className="w-4 h-4 rounded border-neutral-300 dark:border-neutral-700 text-emerald-500 focus:ring-emerald-500/50 cursor-pointer"
+                      />
+                    </label>
                     <button
                       onClick={() => removeFromQueue(item.id)}
-                      className="p-1.5 text-neutral-500 dark:text-neutral-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors shrink-0"
+                      className="p-1.5 text-neutral-400 dark:text-neutral-600 hover:text-red-500 hover:bg-red-500/10 rounded transition-colors shrink-0"
                       title="削除"
                     >
                       <Trash2 className="w-4 h-4" />
