@@ -557,7 +557,7 @@ export default function ImageGenerationTab({ songTitle, setSongTitle, queue, set
       </div>
 
       {/* 右側：設定パネルとプレビュー、キュー */}
-      <div className="flex flex-col space-y-6 h-[calc(100vh-250px)] min-h-[500px]">
+      <div className="flex flex-col space-y-6 h-[calc(100vh-250px)] min-h-[500px] overflow-y-auto custom-scrollbar pr-2">
         
         {/* 設定パネル */}
         <div className="bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 space-y-4 shrink-0">
