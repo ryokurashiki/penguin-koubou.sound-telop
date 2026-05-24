@@ -621,7 +621,7 @@ export default function AudioToolPage() {
                 <span className="bg-neutral-100 dark:bg-neutral-800 text-xs px-2 py-1 rounded text-neutral-600 dark:text-neutral-400">{clips.length} 件</span>
               </h3>
               
-              <div className="flex-1 overflow-y-auto space-y-3 min-h-[200px]">
+              <div className="overflow-y-auto space-y-3 min-h-[200px] resize-y custom-scrollbar pr-1 w-full" style={{ height: "400px" }}>
                 {clips.length === 0 ? (
                   <div className="text-center text-neutral-500 dark:text-neutral-500 text-sm py-12">
                     クリップがありません。<br/>波形やリストから追加してください。
