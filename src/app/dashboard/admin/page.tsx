@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { ShieldAlert, Users, Key, Loader2, Plus, Pencil, Check, X, Construction } from "lucide-react";
+import { ShieldAlert, Users, Key, Loader2, Plus, Pencil, Check, X, Construction, Copy, CheckCircle2 } from "lucide-react";
 
 interface Profile {
   id: string;
@@ -11,6 +11,14 @@ interface Profile {
   display_name: string | null;
   role: string;
   avatar_url: string | null;
+}
+
+interface InviteCode {
+  id: string;
+  code: string;
+  created_at: string;
+  used_at: string | null;
+  used_by: string | null;
 }
 
 export default function AdminDashboardPage() {
@@ -25,6 +33,11 @@ export default function AdminDashboardPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
   const [saveError, setSaveError] = useState<string | null>(null);
+
+  // Invite codes states
+  const [inviteCodes, setInviteCodes] = useState<InviteCode[]>([]);
+  const [inviteGenerating, setInviteGenerating] = useState(false);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   useEffect(() => {
     const checkAdminAndLoadData = async () => {
@@ -64,6 +77,15 @@ export default function AdminDashboardPage() {
           .single();
         if (settingData) {
           setMaintenanceMode(settingData.value === "true");
+        }
+
+        // 招待コード一覧を取得
+        const { data: codesData, error: codesError } = await supabase
+          .from("invite_codes")
+          .select("*")
+          .order("created_at", { ascending: false });
+        if (!codesError && codesData) {
+          setInviteCodes(codesData);
         }
       } catch (err: any) {
         setError(err.message);
@@ -136,6 +158,42 @@ export default function AdminDashboardPage() {
     } finally {
       setMaintenanceLoading(false);
     }
+  };
+
+  const generateInviteCode = async () => {
+    setInviteGenerating(true);
+    try {
+      // 8文字のランダムな英数字（紛らわしい文字を除く）を生成
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let code = '';
+      for (let i = 0; i < 8; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("認証エラー");
+
+      const { data, error } = await supabase
+        .from("invite_codes")
+        .insert([{ code, created_by: user.id }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      setInviteCodes([data, ...inviteCodes]);
+    } catch (err: any) {
+      alert("招待コードの発行に失敗しました: " + err.message);
+    } finally {
+      setInviteGenerating(false);
+    }
+  };
+
+  const copyToClipboard = (code: string) => {
+    const url = `${window.location.origin}/?invite=${code}`;
+    navigator.clipboard.writeText(url);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
   };
 
   if (loading) {
@@ -282,14 +340,51 @@ export default function AdminDashboardPage() {
               <Key className="w-6 h-6 text-emerald-400" />
               招待コード発行
             </h2>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-8 leading-relaxed relative z-10">
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6 leading-relaxed relative z-10">
               新しい利用者をシステムに招待するための、使い捨ての登録リンクを発行します。
             </p>
-            <button className="w-full bg-emerald-600 hover:bg-emerald-500 text-neutral-900 dark:text-white font-medium py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 relative z-10">
-              <Plus className="w-5 h-5" />
+            <button 
+              onClick={generateInviteCode}
+              disabled={inviteGenerating}
+              className="w-full bg-emerald-600 hover:bg-emerald-500 text-neutral-900 dark:text-white font-medium py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 relative z-10 disabled:opacity-50"
+            >
+              {inviteGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
               招待リンクを発行する
             </button>
-            <p className="text-xs text-center text-neutral-500 dark:text-neutral-500 mt-4 relative z-10">※現在はプロトタイプ（UIのみ）です</p>
+
+            {/* 招待コード一覧 */}
+            <div className="mt-8 space-y-3 relative z-10 max-h-64 overflow-y-auto custom-scrollbar pr-2">
+              {inviteCodes.length === 0 ? (
+                <p className="text-xs text-center text-neutral-500">発行された招待コードはありません</p>
+              ) : (
+                inviteCodes.map(code => {
+                  const isUsed = !!code.used_at;
+                  return (
+                    <div key={code.id} className={`p-3 rounded-xl border ${isUsed ? 'bg-neutral-100 dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 opacity-60' : 'bg-white dark:bg-neutral-950 border-emerald-500/30'}`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-mono font-bold text-sm text-neutral-900 dark:text-white tracking-widest">{code.code}</span>
+                        {isUsed ? (
+                          <span className="text-[10px] font-medium bg-neutral-200 dark:bg-neutral-800 text-neutral-500 px-2 py-0.5 rounded">使用済み</span>
+                        ) : (
+                          <span className="text-[10px] font-medium bg-emerald-500/20 text-emerald-500 px-2 py-0.5 rounded shadow-sm shadow-emerald-500/10">未使用</span>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] text-neutral-500">{new Date(code.created_at).toLocaleDateString()}発行</span>
+                        {!isUsed && (
+                          <button 
+                            onClick={() => copyToClipboard(code.code)}
+                            className="text-emerald-500 hover:text-emerald-400 flex items-center gap-1 text-[10px] font-medium transition-colors bg-emerald-500/10 hover:bg-emerald-500/20 px-2 py-1 rounded"
+                          >
+                            {copiedCode === code.code ? <><CheckCircle2 className="w-3 h-3" /> コピー完了</> : <><Copy className="w-3 h-3" /> URLコピー</>}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
           
           {/* メンテナンスモード */}

@@ -49,6 +49,11 @@ function LoginForm() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              invite_code: inviteToken
+            }
+          }
         });
         if (error) throw error;
         await redirectBasedOnRole();
@@ -61,7 +66,13 @@ function LoginForm() {
         await redirectBasedOnRole();
       }
     } catch (err: any) {
-      setError(err.message);
+      if (err.message.includes("Invalid or already used invite code")) {
+        setError("この招待コードは無効または既に使用されています。");
+      } else if (err.message.includes("Invite code is required")) {
+        setError("新規登録には有効な招待コードが必要です。");
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }
