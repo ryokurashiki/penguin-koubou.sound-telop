@@ -743,8 +743,8 @@ export default function ImageGenerationTab({ songTitle, setSongTitle, queue, set
         </button>
 
         {/* 出力リスト */}
-        <div className="flex-1 bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden flex flex-col min-h-[200px]">
-          <div className="bg-neutral-50 dark:bg-neutral-900 px-4 py-2 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between shrink-0">
+        <div className="resize bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-auto flex flex-col min-h-[200px] min-w-[300px] w-full" style={{ height: "400px" }}>
+          <div className="bg-neutral-50 dark:bg-neutral-900 px-4 py-2 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between shrink-0 sticky top-0 z-10">
             <h3 className="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex items-center gap-2">
               出力リスト
               {selectedIds.size > 0 && (
@@ -788,7 +788,7 @@ export default function ImageGenerationTab({ songTitle, setSongTitle, queue, set
               <span className="text-xs bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 px-2 py-1 rounded ml-2 font-mono">{queue.length} 件</span>
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto overflow-x-auto custom-scrollbar p-3 space-y-2">
+          <div className="flex-1 p-3 space-y-2">
             {queue.length === 0 ? (
               <div className="h-full flex items-center justify-center text-neutral-500 dark:text-neutral-500 text-sm text-center px-4">
                 追加された画像がありません。<br/>テキストを選択して追加してください。
