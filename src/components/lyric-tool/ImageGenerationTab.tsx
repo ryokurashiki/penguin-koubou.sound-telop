@@ -472,9 +472,9 @@ export default function ImageGenerationTab({ songTitle, setSongTitle, queue, set
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
       {/* 左側：テキストエリア */}
-      <div className="flex flex-col space-y-4 h-[calc(100vh-250px)] min-h-[500px]">
+      <div className="flex flex-col space-y-4">
         <div>
           <label className="block text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">曲名 / プロジェクト名</label>
           <input
@@ -551,13 +551,13 @@ export default function ImageGenerationTab({ songTitle, setSongTitle, queue, set
             onKeyUp={handleSelection}
             onKeyDown={handleKeyDown}
             placeholder="ここに歌詞やセリフを入力し、画像化したい部分をマウスで選択してください。"
-            className="flex-1 w-full bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-4 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:border-emerald-500 resize-none custom-scrollbar leading-relaxed"
+            className="w-full min-h-[500px] bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-4 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:border-emerald-500 resize-y custom-scrollbar leading-relaxed"
           />
         </div>
       </div>
 
       {/* 右側：設定パネルとプレビュー、キュー */}
-      <div className="flex flex-col space-y-6 h-[calc(100vh-250px)] min-h-[500px] overflow-y-auto custom-scrollbar pr-2">
+      <div className="flex flex-col space-y-6">
         
         {/* 設定パネル */}
         <div className="bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 space-y-4 shrink-0">
