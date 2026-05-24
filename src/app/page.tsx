@@ -96,30 +96,22 @@ function LoginForm() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-neutral-950 flex flex-col justify-center items-center p-4 text-neutral-800 dark:text-neutral-200 font-sans selection:bg-indigo-500/30">
-      {maintenanceMode && !forceAdminLogin ? (
-        <div className="flex flex-col items-center justify-center text-center max-w-md animate-in fade-in zoom-in duration-500">
-          <div className="p-6 bg-amber-500/10 text-amber-400 rounded-full border border-amber-500/20 mb-6 shadow-[0_0_30px_-5px_rgba(245,158,11,0.3)]">
-            <Construction className="w-12 h-12" />
+      <div className="w-full max-w-md bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
+        {maintenanceMode && !forceAdminLogin && (
+          <div className="absolute top-0 left-0 w-full bg-amber-500 text-amber-950 text-xs font-bold py-2 text-center z-50 flex items-center justify-center gap-1.5">
+            <Construction className="w-3.5 h-3.5" />
+            現在メンテナンス中のため、一般ユーザーはログインできません
           </div>
-          <h1 className="text-3xl font-bold text-neutral-900 dark:text-white mb-4">メンテナンス中</h1>
-          <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed mb-8">
-            現在、システムアップデートのためメンテナンスを実施しております。<br/>
-            終了までしばらくお待ちください。
-          </p>
-          <div className="text-xs text-neutral-500 dark:text-neutral-500">
-            Sound Telop
+        )}
+        
+        {maintenanceMode && forceAdminLogin && (
+          <div className="absolute top-0 left-0 w-full bg-amber-500 text-amber-950 text-xs font-bold py-2 text-center z-50 flex items-center justify-center gap-1.5">
+            <Construction className="w-3.5 h-3.5" />
+            メンテナンス中（管理者ログインモード）
           </div>
-        </div>
-      ) : (
-        <div className="w-full max-w-md bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
-          {maintenanceMode && forceAdminLogin && (
-            <div className="absolute top-0 left-0 w-full bg-amber-500 text-amber-950 text-xs font-bold py-2 text-center z-50 flex items-center justify-center gap-1.5">
-              <Construction className="w-3.5 h-3.5" />
-              メンテナンス中（管理者ログインモード）
-            </div>
-          )}
-          
-          {/* Decorative background glow */}
+        )}
+        
+        {/* Decorative background glow */}
         <div className="absolute -top-32 -left-32 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
         
         <div className="mb-8 text-center relative z-10">
