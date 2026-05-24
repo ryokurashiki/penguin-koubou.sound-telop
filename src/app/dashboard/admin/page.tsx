@@ -79,10 +79,11 @@ export default function AdminDashboardPage() {
           setMaintenanceMode(settingData.value === "true");
         }
 
-        // 招待コード一覧を取得
+        // 招待コード一覧を取得（未使用のもののみ）
         const { data: codesData, error: codesError } = await supabase
           .from("invite_codes")
           .select("*")
+          .is("used_at", null)
           .order("created_at", { ascending: false });
         if (!codesError && codesData) {
           setInviteCodes(codesData);
