@@ -188,7 +188,7 @@ export default function AudioToolPage() {
       const url = URL.createObjectURL(zipBlob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${originalName}.zip`;
+      a.download = `sound_telop_clips「${originalName}」.zip`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
