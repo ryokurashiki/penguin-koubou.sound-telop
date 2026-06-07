@@ -152,6 +152,7 @@ export default function AudioToolPage() {
   const handleZipDownload = async () => {
     if (!audioFile || clips.length === 0) return;
     setIsProcessing(true);
+    const originalName = audioFile.name.replace(/\.[^/.]+$/, "");
     try {
       const zip = new JSZip();
 
@@ -162,7 +163,6 @@ export default function AudioToolPage() {
         const clip = clips[i];
         const blob = blobs[i];
         
-        const originalName = audioFile.name.replace(/\.[^/.]+$/, "");
         const indexStr = String(i + 1).padStart(3, '0');
         const fileName = `${originalName}_${indexStr}_${clip.name}.mp3`;
         
@@ -188,7 +188,7 @@ export default function AudioToolPage() {
       const url = URL.createObjectURL(zipBlob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "sound_telop_clips.zip";
+      a.download = `${originalName}.zip`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
